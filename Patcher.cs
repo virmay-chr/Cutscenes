@@ -7,27 +7,6 @@ using UnityEngine.EventSystems;
 
 namespace Cutscenes
 {
-    public class VyInput
-    {
-        public static bool IsTyping
-        {
-            get
-            {
-                try
-                {
-                    if (EventSystem.current.currentSelectedGameObject != null)
-                        if (EventSystem.current.currentSelectedGameObject.TryGetComponent(out TMP_InputField _))
-                            return true;
-                        else return false;
-                    else return false;
-                }
-                catch { return false; }
-
-            }
-        }
-        public static bool GetKeyDown(KeyCode key) => !IsTyping && Input.GetKeyDown(key);
-    }
-
     public class Patcher
     {
         //ON CREATING LEVEL SCENE ================================================================================
@@ -67,34 +46,50 @@ namespace Cutscenes
 
 
         //ON LEVEL ================================================================================
-        static readonly string text = $"[{Plugin.key}] - Skip";
+        static readonly string text = $"[{Plugin.key.Value.MainKey}] - Skip";
         static float glitch = 1;
         static float et = 0;
-        private static readonly float dur = 2.5f;
+        static readonly float dur = 2.5f;
         static StringBuilder sb;
         static bool isCutsceneFlag = false, bypassedFlag = false;
         static float pitchState;
         static float hitSkipTime = float.MaxValue, destTime = float.MaxValue;
-        static LSEffectsManager.GlitchOverrideProfile profile = new()
+        static readonly LSEffectsManager.GlitchOverrideProfile profile = new()
         {
-            intensity = Plugin.glitchIntensity,
+            intensity = Plugin.glitchIntensity.Value,
             speed = 2f,
             width = 0.99f
         };
-
+        static bool IsEditor => Systems.SceneManagement.SceneLoader.Inst.manager.ActiveSceneGroup.GroupName == "Editor";
         [MethodImpl(MethodImplOptions.AggressiveInlining)] static void TweenText() => et = 0.001f;
         [MethodImpl(MethodImplOptions.AggressiveInlining)] static void BreakTweenText() => et = dur / 10 * 9;
 
+
         [HarmonyPostfix]
         [HarmonyPatch(typeof(GameManager), nameof(GameManager.UpdateTimeline))]
-        static void Update(GameManager __instance)
+        static void Update()
         {
             //return if level is not loaded or it is in editing mode
             if (GameManager.inst.CurGameState == GameManager.GameState.Loading
                 || DataManager.inst.gameData.beatmapData.checkpoints == null) return;
 
-            //get closest checkpoint
-            var idx = GameManager.inst.GetClosestCheckpointIndex(null, GameManager.Inst.CurrentSongTimeSmoothed);
+
+            //get current checkpoint
+            var idx = GameManager.inst.GetClosestCheckpointIndex(DataManager.inst.gameData.beatmapData.checkpoints, GameManager.Inst.CurrentSongTimeSmoothed);
+            //get next checkpoint
+            int idx2 = -1;
+            if (!IsEditor) idx2 = idx + 1;
+            else
+            {
+                float min = GameManager.Inst.CurrentSongLength;
+                for (int i = 0; i < DataManager.inst.gameData.beatmapData.checkpoints.Count; i++)
+                    if (GameManager.Inst.CurrentSongTimeSmoothed < DataManager.inst.gameData.beatmapData.checkpoints[i].time && DataManager.inst.gameData.beatmapData.checkpoints[i].time < min)
+                    {
+                        min = DataManager.inst.gameData.beatmapData.checkpoints[i].time;
+                        idx2 = i;
+                    }
+            }
+            bool outOfRange = !IsEditor ? idx == DataManager.inst.gameData.beatmapData.checkpoints.Count - 1 : idx2 == -1;
 
             //if the current checkpoint is CUTSCENE type
             if (DataManager.inst.gameData.beatmapData.checkpoints[idx].name == "!CUTSCENE")
@@ -102,14 +97,14 @@ namespace Cutscenes
                 ///Do once
                 if (!isCutsceneFlag)
                 {
+                    //get destiination time of rewinding
+                    destTime = (!outOfRange ?
+                        DataManager.inst.gameData.beatmapData.checkpoints[idx2].time :
+                        GameManager.inst.CurrentSongLength) - 0.2f;
                     //Hide progress bar
                     GameManager.inst.Timeline.localScale = Vector3.zero;
                     //tween text
                     Plugin.SkipLabel.enabled = true;
-                    destTime = (idx < DataManager.inst.gameData.beatmapData.checkpoints.Count - 1 ?
-                                    DataManager.inst.gameData.beatmapData.checkpoints[idx + 1].time :
-                                    GameManager.inst.CurrentSongLength)
-                                     - 0.2f;
                     TweenText();
                     isCutsceneFlag = true;
                     bypassedFlag = false;
@@ -131,7 +126,7 @@ namespace Cutscenes
                 Plugin.SkipLabel.enabled = glitch < 1;
 
                 //Rewind to the next checkpoint
-                if ((GameManager.inst.CurGameState == GameManager.GameState.Playing || AudioManager.Inst.IsPlaying) && VyInput.GetKeyDown(Plugin.key) && !bypassedFlag)
+                if ((!IsEditor ? GameManager.inst.CurGameState == GameManager.GameState.Playing : AudioManager.Inst.IsPlaying) && VyInput.GetKeyDown() && !bypassedFlag)
                 {
                     //start rewind
                     hitSkipTime = GameManager.inst.CurrentSongTimeSmoothed;
@@ -168,5 +163,26 @@ namespace Cutscenes
                 }
             }
         }
+    }
+
+    public class VyInput
+    {
+        public static bool IsTyping
+        {
+            get
+            {
+                try
+                {
+                    if (EventSystem.current.currentSelectedGameObject != null)
+                        if (EventSystem.current.currentSelectedGameObject.TryGetComponent(out TMP_InputField _))
+                            return true;
+                        else return false;
+                    else return false;
+                }
+                catch { return false; }
+
+            }
+        }
+        public static bool GetKeyDown() => !IsTyping && Plugin.key.Value.IsDown();
     }
 }

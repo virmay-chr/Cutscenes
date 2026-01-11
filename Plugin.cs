@@ -10,12 +10,11 @@ namespace Cutscenes
     public class Plugin : BaseUnityPlugin
     {
         internal static new ManualLogSource Logger;
+        
 
-        ConfigEntry<string> keyConfig;
-        ConfigEntry<float> glitchIntensityConfig;
+        internal static ConfigEntry<KeyboardShortcut> key;
+        internal static ConfigEntry<float> glitchIntensity;
 
-        internal static UnityEngine.KeyCode key;
-        internal static float glitchIntensity;
         internal static TextMeshProUGUI SkipLabel, RewindIcon;
 
         private void Awake()
@@ -23,10 +22,8 @@ namespace Cutscenes
             // Plugin startup logic
             Logger = base.Logger;
 
-            keyConfig = Config.Bind("General", "Key", "K", "The key that skips the cutscene when pressed. (Enter => Return)");
-            glitchIntensityConfig = Config.Bind("General", "Glitch", 0.4f, "The intensity of glitch effect on rewinding [0.00-1.00].");
-            key = (UnityEngine.KeyCode)System.Enum.Parse(typeof(UnityEngine.KeyCode), keyConfig.Value);
-            glitchIntensity = glitchIntensityConfig.Value;
+            key = Config.Bind("General", "Key", new KeyboardShortcut(UnityEngine.KeyCode.K), "The key that skips the cutscene when pressed.");
+            glitchIntensity = Config.Bind("General", "Glitch", 0.3f, "The intensity of glitch effect on rewinding [0.00-1.00].");
 
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Patcher));
 
