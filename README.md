@@ -11,8 +11,8 @@ The levels made with this mod are compatible with vanilla version.
 6. Enjoy!
 
 ## Usage
-To create a cutscene section, all you have to do is create one checkpoint and name it **`!CUTSCENE`**.\
-<img width="221" height="114" alt="image" src="https://github.com/user-attachments/assets/4b7d70c4-5173-48cc-8fe4-fbdfbb02ca11" />
+To create a cutscene section, all you have to do is create one checkpoint, go to checkpoint editor and toggle the `Cutscene` button (name field of this checkpoint will be locked).\
+<img width="261" height="179" alt="Screenshot_1" src="https://github.com/user-attachments/assets/d190db50-4d81-4dfc-b6ba-57a0773f87a0" />
 > [!CAUTION]
 > At this moment, rewinding is not compatible with DOPitch trigger, so it is not recommended to use this trigger in cutscene sections!
 
@@ -27,3 +27,4 @@ After reaching tagged checkpoint, you can press the key, that will rewind the le
 Mod configurations are stored in `BepInEx/configs/Virmay.Cutscenes.cfg`
 - Key - the cutsene skip key.
 - Glitch - The intensity of glitch effect on rewinding [0.00 - 1.00].
+- AfterRestart - Rewind the cutscenes automatically after first restart.
