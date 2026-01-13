@@ -11,8 +11,10 @@ The levels made with this mod are compatible with vanilla version.
 6. Enjoy!
 
 ## Usage
-To create a cutscene section, all you have to do is create one checkpoint, go to checkpoint editor and toggle the `Cutscene` button (name field of this checkpoint will be locked).\
+To create a cutscene section, all you have to do is create one checkpoint, go to checkpoint editor and toggle the `Cutscene` button (name field of this checkpoint will be locked).
+
 <img width="261" height="179" alt="Screenshot_1" src="https://github.com/user-attachments/assets/d190db50-4d81-4dfc-b6ba-57a0773f87a0" />
+
 > [!CAUTION]
 > At this moment, rewinding is not compatible with DOPitch trigger, so it is not recommended to use this trigger in cutscene sections!
 
