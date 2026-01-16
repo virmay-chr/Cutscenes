@@ -35,7 +35,7 @@
   
   <ItemGroup>
     <Reference Include="PAMultiplayer">
-      <HintPath>..\..\..\..\..\home\aiden\.local\share\Steam\steamapps\common\Project Arrhythmia\BepInEx\plugins\PAMultiplayer\PAMultiplayer.dll</HintPath>
+      <HintPath>lib\PAMultiplayer.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
