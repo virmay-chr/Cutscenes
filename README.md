@@ -1,6 +1,6 @@
 # CUTSCENES
 **Cutscenes** is a BepInEx mod for [Project Arrhythmia](https://store.steampowered.com/app/440310/Project_Arrhythmia/), that allows you to create cutscene sections in the Editor and skip them in the Arcade (and in the Editor too).
-The levels made with this mod are compatible with vanilla version.
+The levels made with this mod are compatible with vanilla version (mod doesn't tamper the level file).
 
 ## Installation
 1. Open the **Project Arrhythmia folder**.
